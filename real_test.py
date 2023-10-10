@@ -73,18 +73,18 @@ def clean_text(input_text):
 
 
 if __name__ == '__main__':
-    ranobe = "the-novels-extra"
-    translate = ""
+    ranobe = "second-life-ranker-novel"
+    translate = "?bid=14304&ui=277864"
     tom = 1
-    start = 466
-    chapter_number = 533  # Specify the desired chapter number here
+    start = 4
+    chapter_number = 672  # Specify the desired chapter number here
 
     for chapter in range(start, chapter_number+1):
         try:
             html_content = copy_html_content(ranobe, chapter, tom, translate)
             # print(html_content)
         except:
-            tom += 1 - 1
+            tom += 1
             print("New Tom: ", tom)
             continue
 
