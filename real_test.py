@@ -53,14 +53,22 @@ def extract_summary(html_content):
 
 
 def clean_text(input_text):
-    text = "  ".join(input_text.split())
+    text = input_text.replace("  ", " ")
+    text = text.replace("   ", " ")
+
     cleaned_text = []
     for char in text:
         if ord('А') <= ord(char) <= ord('я') or char in "ёЁ":  # Preserve Russian letters
             cleaned_text.append(char)
         else:
             cleaned_text.append(unidecode(char))  # Replace non-ASCII characters
-    return ''.join(cleaned_text)
+    cleaned_text = ''.join(cleaned_text)
+
+    cleaned_text = cleaned_text.replace("--", "-")
+    cleaned_text = cleaned_text.replace("<<", "\"")
+    cleaned_text = cleaned_text.replace(">>", "\"")
+
+    return cleaned_text
 
 
 
