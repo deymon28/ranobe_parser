@@ -21,13 +21,13 @@ def selenium_firs_page(src):
     for cookie in cookies:
         driver.add_cookie(cookie)
 
-    time.sleep(1)
+    time.sleep(0.1)
     try:
         driver.find_element(By.ID, "content").click()
     except:
         pass
 
-    time.sleep(0.5)
+    time.sleep(0.4)
 
     # pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
     content = driver.page_source.encode('utf-8').strip()
@@ -61,7 +61,7 @@ def chapter_pages(book):
 def parse_chapters_hrefs(book_url, number_of_pages):
     names_hrefs = {}
 
-    for i in range(2, number_of_pages + 1):
+    for i in range(1, number_of_pages + 1):
         url = f"{book_url}page/{i}"
         html_content = request_page(url)
         soup = BeautifulSoup(html_content, 'lxml')
@@ -99,7 +99,7 @@ def extrakt_chapter(names_hrefs):
         result = '\n'.join(formatted_paragraphs)
         result = name + "\n\n" + result
 
-        clean_chapter = clean_text(text)
+        clean_chapter = clean_text(result)
         save_chapter(clean_chapter, name)
         # return name, result #завершує цикл після 1 операції, потрібно виправити
 
@@ -125,6 +125,8 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace(" !", "!")
     cleaned_text = cleaned_text.replace(" ?", "?")
 
+    cleaned_text = '\n'.join(line.lstrip() for line in cleaned_text.split('\n'))
+
     return cleaned_text
 
 
@@ -133,8 +135,6 @@ def save_chapter(text, name):
         output_file.write(text)
 
     print("Chapter saved how:", name)
-
-
 
 
 if __name__ == '__main__':
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     names_hrefs = parse_chapters_hrefs(book, number_of_pages)
 
-    name, text = extrakt_chapter(names_hrefs)
+    extrakt_chapter(names_hrefs)
 
     # clean_chapter = clean_text(text)
     #
