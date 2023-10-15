@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import requests
 from unidecode import unidecode
 import time
 from selenium import webdriver
@@ -13,16 +12,23 @@ def selenium_firs_page(src):
     options = Options()
     options._ignore_local_proxy = True
     options.add_argument(f"user-agent={user_agent}")
-    #options.add_argument('--headless=new')  # hide browser
+    options.add_argument('--headless=new')  # hide browser
 
     driver = webdriver.Chrome(options=options)
     driver.get(src)
+
     cookies = pickle.load(open("cookies.pkl", "rb"))
     for cookie in cookies:
         driver.add_cookie(cookie)
+
     time.sleep(1)
-    driver.find_element(By.ID, "content").click()
-    time.sleep(1)
+    try:
+        driver.find_element(By.ID, "content").click()
+    except:
+        pass
+
+    time.sleep(0.5)
+
     # pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
     content = driver.page_source.encode('utf-8').strip()
     # soup = BeautifulSoup(content, 'lxml')
@@ -31,20 +37,8 @@ def selenium_firs_page(src):
     return content
 
 
-
-
 def request_page(url):
     return selenium_firs_page(url)
-    #
-    # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'}
-    # response = requests.get(url, headers=headers, cookies=load_cookies())
-    #
-    # if response.status_code == 200:
-    #     html_content = response.content
-    #     return html_content
-    # else:
-    #     print(f"Failed to retrieve HTML content for page {url}. Status code: {response.status_code}")
-    #     return None
 
 
 def chapter_pages(book):
@@ -68,27 +62,21 @@ def parse_chapters_hrefs(book_url, number_of_pages):
     names_hrefs = {}
 
     for i in range(2, number_of_pages + 1):
-        url = book_url + f"page/{i}"
-
-
+        url = f"{book_url}page/{i}"
         html_content = request_page(url)
         soup = BeautifulSoup(html_content, 'lxml')
 
-        # y = 1
-        # while y <= 30:
-        divs = soup.find_all("div", class_="cat_block cat_line")
-        for div in divs:
+        chapter_divs = soup.find_all("div", class_="cat_block cat_line")
+        print(chapter_divs)
+        for div in chapter_divs:
             a_tag = div.find("a")
             if a_tag:
-                temporarily = {a_tag.get('title'): a_tag.get('href')}
-                names_hrefs.update(temporarily)
+                chapter_title = a_tag.get('title')
+                chapter_link = a_tag.get('href')
+                names_hrefs[chapter_title] = chapter_link
+            else:
+                print("Warning: No chapter link found in div.")
 
-            # print(divs)
-            # temporarily = {divs.get('title'): divs.get('href')}
-            # names_hrefs.update(temporarily)
-            # y += 1
-
-    print(names_hrefs)
     return names_hrefs
 
 
@@ -111,15 +99,9 @@ def extrakt_chapter(names_hrefs):
         result = '\n'.join(formatted_paragraphs)
         result = name + "\n\n" + result
 
-        return name, result #завершує цикл після 1 операції, потрібно виправити
-
-
-
-def save_chapter(text, name):
-    with open(f'{name}.txt', 'w', encoding='utf-8') as output_file:
-        output_file.write(text)
-
-    print("Text extracted and saved to:", name)
+        clean_chapter = clean_text(text)
+        save_chapter(clean_chapter, name)
+        # return name, result #завершує цикл після 1 операції, потрібно виправити
 
 
 def clean_text(input_text):
@@ -137,15 +119,28 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace("--", "-")
     cleaned_text = cleaned_text.replace("<<", "\"")
     cleaned_text = cleaned_text.replace(">>", "\"")
+    cleaned_text = cleaned_text.replace("<", "\"")
+    cleaned_text = cleaned_text.replace(">", "\"")
     cleaned_text = cleaned_text.replace(" .", ".")
+    cleaned_text = cleaned_text.replace(" !", "!")
+    cleaned_text = cleaned_text.replace(" ?", "?")
 
     return cleaned_text
+
+
+def save_chapter(text, name):
+    with open(f'{name}.txt', 'w', encoding='utf-8') as output_file:
+        output_file.write(text)
+
+    print("Chapter saved how:", name)
+
+
 
 
 if __name__ == '__main__':
     book = "https://ranobes.com/chapters/second-life-ranker/"
 
-    selenium_firs_page(book)
+    # selenium_firs_page(book)
 
     number_of_pages = chapter_pages(book)
 
@@ -153,6 +148,6 @@ if __name__ == '__main__':
 
     name, text = extrakt_chapter(names_hrefs)
 
-    clean_chapter = clean_text(text)
-
-    save_chapter(clean_chapter, name)
+    # clean_chapter = clean_text(text)
+    #
+    # save_chapter(clean_chapter, name)
