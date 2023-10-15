@@ -1,12 +1,42 @@
 from bs4 import BeautifulSoup
 import requests
 from unidecode import unidecode
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import pickle
+
+
+def selenium_firs_page(src):
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+
+    options = Options()
+    options._ignore_local_proxy = True
+    options.add_argument(f"user-agent={user_agent}")
+    #options.add_argument('--headless=new')  # hide browser
+
+    driver = webdriver.Chrome(options=options)
+    driver.get(src)
+    cookies = pickle.load(open("cookies.pkl", "rb"))
+    for cookie in cookies:
+        driver.add_cookie(cookie)
+    time.sleep(1000)
+    pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
+    content = driver.page_source.encode('utf-8').strip()
+    soup = BeautifulSoup(content, 'lxml')
+    return print(soup, "\n\n\n\n\n\n\################################\\\n\n\n\n\n\n\n\n\n\n\n")
+
+    # return html_content
+
+def load_cookies():
+    with open('cookies.pkl', 'rb') as f:
+        pickle.load(f)
 
 
 def request_page(url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-    response = requests.get(url, headers=headers)
+
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'}
+    response = requests.get(url, headers=headers, cookies=load_cookies())
 
     if response.status_code == 200:
         html_content = response.content
@@ -20,8 +50,9 @@ def chapter_pages(book):
     html_content = request_page(book)
 
     soup = BeautifulSoup(html_content, 'lxml')
+    print(soup)
 
-    number_of_pages = soup.find("<div>", _class="pages").find_all("a")
+    number_of_pages = soup.find("<div>", class_="pages").find_all("a")
 
     if number_of_pages:
         last_number_of_pages = number_of_pages[-1]
@@ -94,12 +125,15 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace("--", "-")
     cleaned_text = cleaned_text.replace("<<", "\"")
     cleaned_text = cleaned_text.replace(">>", "\"")
+    cleaned_text = cleaned_text.replace(" .", ".")
 
     return cleaned_text
 
 
 if __name__ == '__main__':
     book = "https://ranobes.com/chapters/second-life-ranker/"
+
+    selenium_firs_page(book)
 
     number_of_pages = chapter_pages(book)
 

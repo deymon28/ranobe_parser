@@ -7,7 +7,7 @@ def copy_html_content(ranobe, chapter_number, tom, translate):
 
     url = f"https://ranobelib.me/{ranobe}/v{tom}/c{chapter_number}{translate}"
 
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'}
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
@@ -67,17 +67,22 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace("--", "-")
     cleaned_text = cleaned_text.replace("<<", "\"")
     cleaned_text = cleaned_text.replace(">>", "\"")
+    cleaned_text = cleaned_text.replace("<", "\"")
+    cleaned_text = cleaned_text.replace(">", "\"")
+    cleaned_text = cleaned_text.replace(" .", ".")
+    cleaned_text = cleaned_text.replace(" !", "!")
+    cleaned_text = cleaned_text.replace(" ?", "?")
 
     return cleaned_text
 
 
 
 if __name__ == '__main__':
-    ranobe = "second-life-ranker-novel"
-    translate = "?bid=14304&ui=277864"
-    tom = 1
-    start = 4
-    chapter_number = 672  # Specify the desired chapter number here
+    ranobe = "immortal-drunkard"
+    translate = ""
+    tom = 5
+    start = 430
+    chapter_number = 458  # Specify the desired chapter number here
 
     for chapter in range(start, chapter_number+1):
         try:
