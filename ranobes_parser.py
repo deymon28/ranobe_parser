@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 import time
+import re
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import pickle
@@ -21,13 +22,13 @@ def selenium_firs_page(src):
     for cookie in cookies:
         driver.add_cookie(cookie)
 
-    time.sleep(0.1)
+    time.sleep(0.2)
     try:
         driver.find_element(By.ID, "content").click()
     except:
         pass
 
-    time.sleep(0.4)
+    time.sleep(0.8)
 
     # pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
     content = driver.page_source.encode('utf-8').strip()
@@ -105,8 +106,7 @@ def extrakt_chapter(names_hrefs):
 
 
 def clean_text(input_text):
-    text = input_text.replace("  ", " ")
-    text = text.replace("   ", " ")
+    text = re.sub(r' +', ' ', input_text) # need tests on workability
 
     cleaned_text = []
     for char in text:
@@ -119,8 +119,8 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace("--", "-")
     cleaned_text = cleaned_text.replace("<<", "\"")
     cleaned_text = cleaned_text.replace(">>", "\"")
-    cleaned_text = cleaned_text.replace("<", "\"")
-    cleaned_text = cleaned_text.replace(">", "\"")
+    cleaned_text = cleaned_text.replace("<", "")
+    cleaned_text = cleaned_text.replace(">", "")
     cleaned_text = cleaned_text.replace(" .", ".")
     cleaned_text = cleaned_text.replace(" !", "!")
     cleaned_text = cleaned_text.replace(" ?", "?")
@@ -138,7 +138,7 @@ def save_chapter(text, name):
 
 
 if __name__ == '__main__':
-    book = "https://ranobes.com/chapters/second-life-ranker/"
+    book = "https://ranobes.com/chapters/the-novels-extra/"
 
     # selenium_firs_page(book)
 

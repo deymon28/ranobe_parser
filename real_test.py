@@ -53,8 +53,7 @@ def extract_summary(html_content):
 
 
 def clean_text(input_text):
-    text = input_text.replace("  ", " ")
-    text = text.replace("   ", " ")
+    text = re.sub(r' +', ' ', input_text) # need tests on workability
 
     cleaned_text = []
     for char in text:
@@ -67,8 +66,8 @@ def clean_text(input_text):
     cleaned_text = cleaned_text.replace("--", "-")
     cleaned_text = cleaned_text.replace("<<", "\"")
     cleaned_text = cleaned_text.replace(">>", "\"")
-    cleaned_text = cleaned_text.replace("<", "\"")
-    cleaned_text = cleaned_text.replace(">", "\"")
+    cleaned_text = cleaned_text.replace("<", "")
+    cleaned_text = cleaned_text.replace(">", "")
     cleaned_text = cleaned_text.replace(" .", ".")
     cleaned_text = cleaned_text.replace(" !", "!")
     cleaned_text = cleaned_text.replace(" ?", "?")
@@ -78,19 +77,22 @@ def clean_text(input_text):
 
 
 if __name__ == '__main__':
-    ranobe = "immortal-drunkard"
+    ranobe = "the-novels-extra"
     translate = ""
-    tom = 5
-    start = 430
-    chapter_number = 458  # Specify the desired chapter number here
+    tom = 1
+    start = 1
+    chapter_number = 560  # Specify the desired chapter number here
 
     for chapter in range(start, chapter_number+1):
         try:
             html_content = copy_html_content(ranobe, chapter, tom, translate)
             # print(html_content)
         except:
-            tom += 1
+            tom += 1-1
             print("New Tom: ", tom)
+            continue
+
+        if html_content == None:
             continue
 
         extracted_text, output_file_path = extract_summary(html_content)

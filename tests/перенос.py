@@ -31,5 +31,5 @@ def process_file(filepath):
 
 # Provide the directory path where your .txt files are located
 if __name__ == '__main__':
-    directory_path = r"D:\Python_projects\Htmlparse"
+    directory_path = r"/"
     process_files(directory_path)

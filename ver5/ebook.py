@@ -46,22 +46,22 @@ def clean_text(text):
     text = text.replace("~", "")  # Replace ⁓ with a space
     text = text.replace("¬", "")    # Remove ¬ character
     
-    # text = text.replace(" …", ".")
-    # text = text.replace(".…", ".")
-    # text = text.replace(" ……", ".")
-    # text = text.replace(" ….", ".")
-    # text = text.replace(" …….", ".")
+    text = text.replace(" …", ".")
+    text = text.replace(".…", ".")
+    text = text.replace(" ……", ".")
+    text = text.replace(" ….", ".")
+    text = text.replace(" …….", ".")
 
-    # text = text.replace("……….", ".")
-    # text = text.replace("«", '"')
-    # text = text.replace("»", '"')
-    # text = text.replace("….", ".")
-    # text = text.replace("   ", " ")
-    # text = text.replace("  ", " ")
-    # text = text.replace("……", ".")
-    # text = text.replace("..", ".")
-    # text = text.replace(" .", ".")
-    # text = text.replace(' ".', '"')
+    text = text.replace("……….", ".")
+    text = text.replace("«", '"')
+    text = text.replace("»", '"')
+    text = text.replace("….", ".")
+    text = text.replace("   ", " ")
+    text = text.replace("  ", " ")
+    text = text.replace("……", ".")
+    text = text.replace("..", ".")
+    text = text.replace(" .", ".")
+    text = text.replace(' ".', '"')
 
 
     # Remove leading/trailing whitespaces
@@ -98,5 +98,5 @@ def split_epub_to_chapters(epub_file):
 
 
 # Example usage
-epub_file_path = r"C:\Users\dimag\Desktop\Second Life Ranker[1].epub"
+epub_file_path = r"C:\Users\dimag\Desktop\The Novel’s Extra[1].epub"
 split_epub_to_chapters(epub_file_path)
