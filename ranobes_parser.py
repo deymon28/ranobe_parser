@@ -81,28 +81,37 @@ def parse_chapters_hrefs(book_url, number_of_pages):
     return names_hrefs
 
 
-def extrakt_chapter(names_hrefs):
-
+def extract_chapter(names_hrefs):
     for name, href in names_hrefs.items():
         html_content = request_page(href)
         soup = BeautifulSoup(html_content, 'lxml')
 
+        # Extract text from elements with class 'text' that have 'p' elements
         paragraphs = soup.select('.text p')
 
-        # Extract and format the paragraphs
-        formatted_paragraphs = []
-        for paragraph in paragraphs:
-            # Remove any existing line breaks within the paragraph
-            cleaned_paragraph = paragraph.get_text().replace('\n', ' ')
-            formatted_paragraphs.append(cleaned_paragraph)
+        if paragraphs:
+            # If paragraphs are found, extract and format them
+            formatted_paragraphs = []
+            for paragraph in paragraphs:
+                # Remove any existing line breaks within the paragraph
+                cleaned_paragraph = paragraph.get_text().replace('\n', ' ')
+                formatted_paragraphs.append(cleaned_paragraph)
 
-        # Join the paragraphs with a newline character after each </p>
-        result = '\n'.join(formatted_paragraphs)
+            # Join the paragraphs with a newline character after each </p>
+            result = '\n'.join(formatted_paragraphs)
+        else:
+            # If there are no 'p' elements, extract and format the text directly from the '.text' element
+            text_element = soup.select_one('.text')
+            if text_element:
+                result = text_element.get_text().replace('\n', ' ')
+                result = result.replace('<br>', '\n')
+            else:
+                result = ""  # Handle the case where no text is found
+
         result = name + "\n\n" + result
 
         clean_chapter = clean_text(result)
         save_chapter(clean_chapter, name)
-        # return name, result #завершує цикл після 1 операції, потрібно виправити
 
 
 def clean_text(input_text):
@@ -146,7 +155,7 @@ if __name__ == '__main__':
 
     names_hrefs = parse_chapters_hrefs(book, number_of_pages)
 
-    extrakt_chapter(names_hrefs)
+    extract_chapter(names_hrefs)
 
     # clean_chapter = clean_text(text)
     #
